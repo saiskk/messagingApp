@@ -1,43 +1,48 @@
 package com.sakeshet.service.spring.messaging.responseModel;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sakeshet.service.spring.messaging.model.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MessageResponse {
+    @JsonProperty("status")
     private final Status status;
+    @JsonProperty("message")
     private final String message;
-    private final String data;
+    @JsonProperty("data")
+    private final List<Map<String, Object>> data;
 
     public MessageResponse(Status status, String message, List<Message> messagesList) {
         this.status = status;
         this.message = message;
-        if(messagesList==null || messagesList.isEmpty())
-        {
-            this.data = "[]";
-        }
-        else {
-            Map<String, List<String>> aggregatedMap = new HashMap<>();
-            messagesList.forEach(eachMessage -> aggregatedMap.computeIfAbsent(eachMessage.getSenderUsername(), key -> new ArrayList<>())
-                    .add(eachMessage.getText()));
-            StringBuilder stringBuilder = new StringBuilder("[");
-            for (Map.Entry<String, List<String>> entry : aggregatedMap.entrySet()) {
-                stringBuilder.append("{")
-                        .append("\"username\":\"").append(entry.getKey()).append("\",")
-                        .append("\"texts\":").append(convertListToString(entry.getValue()))
-                        .append("},");
-            }
+        this.data = convertMessagesToMap(messagesList);
+    }
 
-            if (stringBuilder.length() > 1) {
-                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            }
-
-            stringBuilder.append("]");
-            this.data = stringBuilder.toString();
+    private List<Map<String, Object>> convertMessagesToMap(List<Message> messagesList) {
+        if (messagesList == null || messagesList.isEmpty()) {
+            return Collections.emptyList();
         }
+
+        Map<String, List<String>> aggregatedMap = new HashMap<>();
+
+        // Aggregate messages based on sender's username
+        messagesList.forEach(eachMessage ->
+                aggregatedMap.computeIfAbsent(eachMessage.getSenderUsername(), key -> new ArrayList<>())
+                        .add(eachMessage.getText())
+        );
+
+        List<Map<String, Object>> formattedMessages = new ArrayList<>();
+
+        // Convert aggregatedMap entries to the desired format
+        aggregatedMap.forEach((username, texts) -> {
+            Map<String, Object> messageMap = new HashMap<>();
+            messageMap.put("username", username);
+            messageMap.put("texts", texts);
+            formattedMessages.add(messageMap);
+        });
+
+        return formattedMessages;
     }
 
     public Status getStatus() {
@@ -46,10 +51,6 @@ public class MessageResponse {
 
     public String getMessage() {
         return message;
-    }
-
-    public String getData() {
-        return data;
     }
 
     private static String convertListToString(List<String> list) {

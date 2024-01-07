@@ -2,6 +2,7 @@ package com.sakeshet.service.spring.messaging.controller;
 
 import com.sakeshet.service.spring.messaging.model.Message;
 import com.sakeshet.service.spring.messaging.requestmodel.MessageRequest;
+import com.sakeshet.service.spring.messaging.responseModel.ChatHistoryResponse;
 import com.sakeshet.service.spring.messaging.responseModel.MessageResponse;
 import com.sakeshet.service.spring.messaging.service.MessageService;
 import com.sakeshet.service.spring.messaging.service.UserService;
@@ -30,6 +31,10 @@ public class MessageController {
     public ResponseEntity<String> sendMessage(
             @PathVariable String senderUsername,
             @RequestBody MessageRequest messageRequest) {
+        if(senderUsername.equals(messageRequest.getTo()))
+        {
+            return ResponseEntity.badRequest().body("Sender cannot be same as Receiver");
+        }
         if(!userService.existsUser(messageRequest.getTo()))
         {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -55,5 +60,18 @@ public class MessageController {
             return ResponseEntity.ok(new MessageResponse(MessageResponse.Status.SUCCESS, "No new messages", null));
         }
     }
+
+    @GetMapping(value = "/{username}/message", params = "friend")
+    public ResponseEntity<ChatHistoryResponse> getChatHistory(
+            @PathVariable String username,
+            @RequestParam String friend) {
+        if(username.equals(friend))
+        {
+            return ResponseEntity.badRequest().body(new ChatHistoryResponse("failure",List.of()));
+        }
+        List<Message> chatHistory = messageService.getChatHistory(username, friend);
+        return ResponseEntity.ok(new ChatHistoryResponse("success", chatHistory));
+    }
+
 }
 

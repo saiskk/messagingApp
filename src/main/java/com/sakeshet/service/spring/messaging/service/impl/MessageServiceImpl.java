@@ -32,6 +32,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public List<Message> getChatHistory(String user1, String user2) {
-        return null;
+        return messageRepository.findBySenderUsernameAndReceiverUsernameOrSenderUsernameAndReceiverUsernameOrderByTimestamp(
+                user1, user2, user2, user1);
     }
 }

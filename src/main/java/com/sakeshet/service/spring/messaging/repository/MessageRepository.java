@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface MessageRepository extends JpaRepository<Message, Long> {
     List<Message> findByreceiverUsernameAndReadFalse(String toUsername);
+    List<Message> findBySenderUsernameAndReceiverUsernameOrSenderUsernameAndReceiverUsernameOrderByTimestamp(
+            String sender1, String receiver1, String sender2, String receiver2);
 
     @Transactional
     @Modifying
