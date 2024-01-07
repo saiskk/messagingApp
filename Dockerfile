@@ -3,6 +3,7 @@ FROM openjdk:17.0.2-slim-buster AS build
 WORKDIR /messaging
 COPY . .
 COPY mvnw ./
+RUN chmod +x mvnw
 RUN ./mvnw clean install
 
 # Stage 2: Create a lightweight image to run the application
