@@ -5,7 +5,7 @@ import com.sakeshet.service.spring.messaging.model.Message;
 import java.util.List;
 
 public interface MessageService {
-    void saveMessage(Message message);
+    boolean sendMessage(String senderUsername, String receiverUsername, String messageBody);
 
     List<Message> getUnreadMessagesForAUser(String user1);
 

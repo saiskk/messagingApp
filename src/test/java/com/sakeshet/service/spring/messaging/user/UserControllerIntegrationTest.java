@@ -6,6 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.sakeshet.service.spring.messaging.ResponseUtil.failureResponseBody;
+import static com.sakeshet.service.spring.messaging.ResponseUtil.successResponseBody;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -16,8 +18,6 @@ class UserControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     private static final String requestBodyUser1 = "{\"username\": \"user1\", \"password\": \"halo\"}";
-    private static final String successResponseBody = "{\"message\":\"User created successfully\",\"status\":\"success\"}";
-    private static final String failureResponseBody = "{\"message\":\"User already exists\",\"status\":\"failure\"}";
     private static final String requestBodyUser2 = "{\"username\": \"user@_2\", \"password\": \"halo\"}";
     private static final String requestBodyDuplicateUser2 = "{\"username\": \"user@_2\", \"password\": \"h@@lo\"}";
     @Test

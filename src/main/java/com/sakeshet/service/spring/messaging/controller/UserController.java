@@ -1,7 +1,5 @@
 package com.sakeshet.service.spring.messaging.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sakeshet.service.spring.messaging.model.User;
 import com.sakeshet.service.spring.messaging.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -12,50 +10,28 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
+
+import static com.sakeshet.service.spring.messaging.ResponseUtil.failureResponseBody;
+import static com.sakeshet.service.spring.messaging.ResponseUtil.successResponseBody;
 
 @RestController
 public class UserController {
     private final UserService userService;
-    private final ObjectMapper objectMapper;
 
-    public UserController(UserService userService, ObjectMapper objectMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.objectMapper = objectMapper;
     }
     @PostMapping("/user")
     public ResponseEntity<String> createUser(@Validated @RequestBody User user){
         Optional<User> userOptional = userService.createUser(user);
-        Map<String, String> response = new HashMap<>();
         if(userOptional.isPresent())
         {
-            response.put("message", "User created successfully");
-            response.put("status", "success");
-            String finalResponse;
-            try {
-                finalResponse = objectMapper.writeValueAsString(response);
-            }
-            catch (JsonProcessingException e) {
-                finalResponse = "{\"status\":\"error\",\"message\":\"JSON processing error\"}";
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(finalResponse);
-            }
-            return ResponseEntity.status(HttpStatus.CREATED).body(finalResponse);
+            return ResponseEntity.status(HttpStatus.CREATED).body(successResponseBody);
         }
         else {
-            response.put("message", "User already exists");
-            response.put("status", "failure");
-            String finalResponse;
-            try {
-                finalResponse = objectMapper.writeValueAsString(response);
-            }
-            catch (JsonProcessingException e) {
-                finalResponse = "{\"status\":\"error\",\"message\":\"JSON processing error\"}";
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(finalResponse);
-            }
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(finalResponse);
+                    .body(failureResponseBody);
         }
     }
 
