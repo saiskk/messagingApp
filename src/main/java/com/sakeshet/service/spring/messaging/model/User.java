@@ -1,7 +1,7 @@
 package com.sakeshet.service.spring.messaging.model;
 
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GenerationType;
@@ -11,11 +11,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +32,9 @@ public class User {
         // Default constructor
     }
 
-    public User(String username, String rawPassword) {
+    public User(String username, String password) {
         this.username = username;
-        this.password = hashPassword(rawPassword);
+        this.password = hashPassword(password);
     }
 
     public Long getId() {
@@ -44,12 +45,13 @@ public class User {
         return username;
     }
 
-    public String getPasswordHash() {
+    public String getPassword() {
         return password;
     }
 
     private String hashPassword(String rawPassword) {
-        return new BCryptPasswordEncoder().encode(rawPassword);
+        return rawPassword;
+//        return new BCryptPasswordEncoder().encode(rawPassword);
     }
 
     @Override
