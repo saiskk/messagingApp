@@ -5,7 +5,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -17,6 +16,8 @@ class UserControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
     private static final String requestBodyUser1 = "{\"username\": \"user1\", \"password\": \"halo\"}";
+    private static final String successResponseBody = "{\"message\":\"User created successfully\",\"status\":\"success\"}";
+    private static final String failureResponseBody = "{\"message\":\"User already exists\",\"status\":\"failure\"}";
     private static final String requestBodyUser2 = "{\"username\": \"user@_2\", \"password\": \"halo\"}";
     private static final String requestBodyDuplicateUser2 = "{\"username\": \"user@_2\", \"password\": \"h@@lo\"}";
     @Test
@@ -29,13 +30,13 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyUser1))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("User created successfully"));
+                .andExpect(content().string(successResponseBody));
 
         mockMvc.perform(post("/user")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyUser1))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("User already exists"));
+                .andExpect(content().string(failureResponseBody));
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
@@ -45,7 +46,7 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyUser2))
                 .andExpect(status().isCreated())
-                .andExpect(content().string("User created successfully"));
+                .andExpect(content().string(successResponseBody));
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
@@ -55,7 +56,7 @@ class UserControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBodyDuplicateUser2))
                 .andExpect(status().isConflict())
-                .andExpect(content().string("User already exists"));
+                .andExpect(content().string(failureResponseBody));
 
         mockMvc.perform(get("/user"))
                 .andExpect(status().isOk())
