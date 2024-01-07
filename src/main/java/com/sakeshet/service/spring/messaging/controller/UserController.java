@@ -23,30 +23,27 @@ public class UserController {
         Optional<User> userOptional = userService.createUser(user);
         if(userOptional.isPresent())
         {
-            return ResponseEntity.ok("User created successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("User already exists");
         }
     }
 
     @GetMapping("/user")
     public ResponseEntity<String> getUsers(){
-        List<String> usernameList = userService.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
-
         StringBuilder stringBuilder = new StringBuilder("[");
-        for (String username : usernameList) {
-            stringBuilder.append("\"").append(username).append("\",");
-        }
+        userService
+                .getUsers()
+                .stream()
+                .forEach(user -> stringBuilder.append("\"").append(user.getUsername()).append("\","));
 
-        if (!usernameList.isEmpty()) {
+        if (stringBuilder.length() > 1) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         }
-
         stringBuilder.append("]");
 
-        String result = stringBuilder.toString();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(stringBuilder.toString());
     }
 }
