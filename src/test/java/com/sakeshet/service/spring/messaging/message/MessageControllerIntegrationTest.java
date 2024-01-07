@@ -25,7 +25,7 @@ class MessageControllerIntegrationTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository; // Assuming you have a UserRepository
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {

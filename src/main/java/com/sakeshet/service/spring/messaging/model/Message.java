@@ -67,7 +67,7 @@ public class Message {
         return timestamp;
     }
 
-    public void markRead()
+    public void markAsRead()
     {
         this.read = true;
     }

@@ -1,11 +1,15 @@
 package com.sakeshet.service.spring.messaging.controller;
 
+import com.sakeshet.service.spring.messaging.model.Message;
 import com.sakeshet.service.spring.messaging.requestmodel.MessageRequest;
+import com.sakeshet.service.spring.messaging.responseModel.MessageResponse;
 import com.sakeshet.service.spring.messaging.service.MessageService;
 import com.sakeshet.service.spring.messaging.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.sakeshet.service.spring.messaging.ResponseUtil.messageSentResponse;
 import static com.sakeshet.service.spring.messaging.ResponseUtil.messageNotSentResponse;
@@ -38,6 +42,17 @@ public class MessageController {
             return ResponseEntity.ok(messageSentResponse);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(messageNotSentResponse);
+        }
+    }
+
+    @GetMapping("/{username}/message")
+    public ResponseEntity<MessageResponse> getUnreadMessages(@PathVariable String username) {
+        List<Message> unreadMessages = messageService.getUnreadMessagesForAUser(username);
+
+        if (!unreadMessages.isEmpty()) {
+            return ResponseEntity.ok(new MessageResponse(MessageResponse.Status.SUCCESS, "You have message(s)", unreadMessages));
+        } else {
+            return ResponseEntity.ok(new MessageResponse(MessageResponse.Status.SUCCESS, "No new messages", null));
         }
     }
 }
